@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Ultimate Universe - Админ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #00cec9;
+            --danger: #ff7675;
+            --success: #00b894;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f5f5f5;
+            --card-bg: rgba(30, 30, 46, 0.9);
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        /* Мобильная навигация */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 10px;
+            border-top: 1px solid rgba(108, 92, 231, 0.3);
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .nav-btn i {
+            font-size: 18px;
+        }
+
+        .nav-btn.active {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--secondary);
+        }
+
+        /* Основной контейнер */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto 70px;
+            padding: 15px;
+        }
+
+        /* Заголовок */
+        .header {
+            text-align: center;
+            padding: 25px 15px;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(0, 206, 201, 0.1));
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            margin-bottom: 15px;
+        }
+
+        /* Карточки */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-icon {
+            font-size: 24px;
+            color: var(--accent);
+            background: rgba(0, 206, 201, 0.1);
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        /* Формы и инпуты */
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        textarea.input-field {
+            min-height: 180px;
+            resize: vertical;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #e17055);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), var(--accent));
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Статус бар */
+        .status-bar {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: rgba(30, 30, 46, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 2px solid var(--success);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1001;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Панель опасных действий */
+        .danger-panel {
+            background: linear-gradient(135deg, rgba(255, 118, 117, 0.1), rgba(225, 112, 85, 0.05));
+            border: 2px solid var(--danger);
+        }
+
+        /* Информационная панель */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        /* Уведомления */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Для ПК */
+        @media (min-width: 1024px) {
+            body {
+                padding: 30px;
+                font-size: 16px;
+            }
+            
+            .container {
+                margin-bottom: 30px;
+            }
+            
+            .mobile-nav {
+                display: none;
+            }
+            
+            .cards-grid {
+                gap: 25px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .btn {
+                width: auto;
+                min-width: 180px;
+            }
+            
+            .btn-group {
+                display: flex;
+                gap: 15px;
+            }
+        }
+
+        /* Для планшетов */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Темная тема улучшения */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card-bg: rgba(40, 40, 60, 0.9);
+            }
+        }
+
+        /* Анимации */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Свитч-переключатель */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <div class="header fade-in">
+            <h1 class="title">🔧 Ultimate Universe</h1>
+            <p class="subtitle">Административная панель управления</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                <span style="background: rgba(0, 184, 148, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;">
+                    <i class="fas fa-shield-alt"></i> Только для администратора
+                </span>
+                <span style="background: rgba(108, 92, 231, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;">
+                    <i class="fas fa-mobile-alt"></i> Адаптивный дизайн
+                </span>
+            </div>
+        </div>
+
+        <!-- Сетка карточек -->
+        <div class="cards-grid">
+            <!-- Обновление скрипта -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="card-title">Обновление скрипта</h3>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Версия скрипта:</label>
+                    <input type="text" class="input-field" id="scriptVersion" value="2.0" placeholder="Введите версию">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Lua код:</label>
+                    <textarea class="input-field" id="scriptCode" placeholder="Вставьте сюда новый Lua скрипт..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="updateScript()">
+                        <i class="fas fa-sync"></i> Обновить для всех
+                    </button>
+                    <button class="btn btn-success" onclick="saveScript()">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+
+            <!-- Уведомления -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="card-title">Глобальные уведомления</h3>
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Заголовок:</label>
+                    <input type="text" class="input-field" id="notifTitle" placeholder="Новое обновление!">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Сообщение:</label>
+                    <textarea class="input-field" id="notifText" placeholder="Введите текст уведомления..." rows="3"></textarea>
+                </div>
+                
+                <button class="btn btn-primary" onclick="sendNotification()">
+                    <i class="fas fa-paper-plane"></i> Отправить всем
+                </button>
+            </div>
+
+            <!-- Управление читами -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="card-title">Управление читами</h3>
+                </div>
+                
+                <div class="input-group">
+                    <label style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span>Включить все читы</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleAllCheats" onchange="toggleAllCheats()">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                
+                <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-success" onclick="enableAll()">
+                        <i class="fas fa-check"></i> Включить
+                    </button>
+                    <button class="btn btn-danger" onclick="disableAll()">
+                        <i class="fas fa-times"></i> Выключить
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label class="input-label">Скорость по умолчанию:</label>
+                    <input type="range" min="16" max="200" value="50" class="input-field" id="speedSlider" oninput="updateSpeed(this.value)">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span style="color: #aaa; font-size: 0.8rem;">16</span>
+                        <span id="speedValue" style="color: var(--accent); font-weight: bold;">50</span>
+                        <span style="color: #aaa; font-size: 0.8rem;">200</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Бан игроков (опасная зона) -->
+            <div class="card danger-panel fade-in">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(255, 118, 117, 0.2);">
+                        <i class="fas fa-ban" style="color: var(--danger);"></i>
+                    </div>
+                    <h3 class="card-title" style="color: var(--danger);">Бан игроков</h3>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Имя игрока:</label>
+                    <input type="text" class="input-field" id="playerName" placeholder="Введите никнейм...">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Причина:</label>
+                    <select class="input-field" id="banReason">
+                        <option value="cheating">Использование читов</option>
+                        <option value="spam">Спам в чате</option>
+                        <option value="toxic">Токсичное поведение</option>
+                        <option value="exploit">Использование эксплойтов</option>
+                        <option value="other">Другая причина</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Дополнительная информация:</label>
+                    <textarea class="input-field" id="banDetails" placeholder="Дополнительные детали..." rows="2"></textarea>
+                </div>
+                
+                <button class="btn btn-danger" onclick="banPlayer()">
+                    <i class="fas fa-gavel"></i> Забанить игрока
+                </button>
+            </div>
+        </div>
+
+        <!-- Информационная панель -->
+        <div class="card fade-in" style="margin-top: 25px;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="card-title">Статистика и информация</h3>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Игроков онлайн</div>
+                    <div class="info-value" id="onlineCount">0</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Версия скрипта</div>
+                    <div class="info-value" id="currentVersion">2.0</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Статус сервера</div>
+                    <div class="info-value" style="color: var(--success);">
+                        <i class="fas fa-circle" style="font-size: 0.7em;"></i> Активен
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Последнее обновление</div>
+                    <div class="info-value" id="lastUpdate">Сегодня, 15:30</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="refreshStats()">
+                    <i class="fas fa-redo"></i> Обновить
+                </button>
+                <button class="btn" style="background: rgba(108,92,231,0.1);" onclick="showLogs()">
+                    <i class="fas fa-history"></i> История действий
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Мобильная навигация -->
+    <div class="mobile-nav">
+        <button class="nav-btn active" onclick="showTab('home')">
+            <i class="fas fa-home"></i>
+            <span>Главная</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('cheats')">
+            <i class="fas fa-gamepad"></i>
+            <span>Читы</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('admin')">
+            <i class="fas fa-cogs"></i>
+            <span>Админ</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('stats')">
+            <i class="fas fa-chart-bar"></i>
+            <span>Статы</span>
+        </button>
+    </div>
+
+    <!-- Статус бар -->
+    <div class="status-bar" id="statusBar">
+        <div class="status-dot"></div>
+        <span id="statusMessage">Готово</span>
+    </div>
+
+    <script>
+        // Обновление скорости
+        function updateSpeed(value) {
+            document.getElementById('speedValue').textContent = value;
+        }
+
+        // Показать статус
+        function showStatus(message, type = 'success') {
+            const statusBar = document.getElementById('statusBar');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusMessage.textContent = message;
+            statusBar.style.borderColor = type === 'error' ? 'var(--danger)' : 
+                                        type === 'warning' ? '#fdcb6e' : 'var(--success)';
+            statusBar.style.display = 'flex';
+            
+            setTimeout(() => {
+                statusBar.style.display = 'none';
+            }, 3000);
+        }
+
+        // Обновление скрипта
+        async function updateScript() {
+            const code = document.getElementById('scriptCode').value;
+            const version = document.getElementById('scriptVersion').value;
+            
+            if (!code.trim()) {
+                showStatus('Введите Lua код!', 'error');
+                return;
+            }
+            
+            showStatus(`Обновляю скрипт до версии ${version}...`, 'warning');
+            
+            // Здесь будет загрузка на GitHub
+            try {
+                // Заглушка для GitHub API
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                showStatus(`Скрипт v${version} успешно обновлен!`);
+                document.getElementById('currentVersion').textContent = version;
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                showStatus('Ошибка при обновлении!', 'error');
+            }
+        }
+
+        // Отправка уведомления
+        function sendNotification() {
+            const title = document.getElementById('notifTitle').value;
+            const text = document.getElementById('notifText').value;
+            
+            if (!title.trim() || !text.trim()) {
+                showStatus('Заполните все поля!', 'error');
+                return;
+            }
+            
+            showStatus(`Уведомление "${title}" отправлено!`);
+            
+            // Очистка полей
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifText').value = '';
+        }
+
+        // Бан игрока
+        function banPlayer() {
+            const player = document.getElementById('playerName').value;
+            const reason = document.getElementById('banReason').value;
+            const details = document.getElementById('banDetails').value;
+            
+            if (!player.trim()) {
+                showStatus('Введите имя игрока!', 'error');
+                return;
+            }
+            
+            showStatus(`Игрок ${player} забанен по причине: ${reason}`, 'warning');
+            
+            // Очистка полей
+            document.getElementById('playerName').value = '';
+            document.getElementById('banDetails').value = '';
+        }
+
+        // Переключение всех читов
+        function toggleAllCheats() {
+            const toggle = document.getElementById('toggleAllCheats');
+            const status = toggle.checked ? 'включены' : 'выключены';
+            showStatus(`Все читы ${status}`);
+        }
+
+        // Обновление статистики
+        function refreshStats() {
+            // Имитация обновления статистики
+            const online = Math.floor(Math.random() * 100) + 50;
+            document.getElementById('onlineCount').textContent = online;
+            showStatus('Статистика обновлена!');
+        }
+
+        // Мобильные табы
+        function showTab(tabName) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            showStatus(`Переход в раздел: ${tabName}`);
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загрузка сохраненного кода (заглушка)
+            const savedCode = localStorage.getItem('ultimate_script');
+            if (savedCode) {
+                document.getElementById('scriptCode').value = savedCode;
+            }
+            
+            // Автосохранение
+            document.getElementById('scriptCode').addEventListener('input', function() {
+                localStorage.setItem('ultimate_script', this.value);
+            });
+            
+            // Обновление времени
+            setInterval(() => {
+                const time = new Date().toLocaleTimeString();
+                document.getElementById('lastUpdate').textContent = `Сегодня, ${time}`;
+            }, 60000);
+            
+            // Показываем приветствие
+            setTimeout(() => {
+                showStatus('Админ-панель готова к работе!');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
